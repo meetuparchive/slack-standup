@@ -1,0 +1,33 @@
+service: slack-standup
+provider:
+  name: aws
+  runtime: python3.6
+  memorySize: 128
+  environment:
+    JIRA_HOST: '${env:JIRA_HOST}'
+    JIRA_USER: '${env:JIRA_USER}'
+    JIRA_PASSWORD: '${env:JIRA_PASSWORD}'
+    PD_TOKEN: '${env:PD_TOKEN}'
+    PD_TEAM_IDS: '${env:PD_TEAM_IDS}'
+  stackTags:
+    'mup:owner': 'core-services'
+    'mup:productName': '${self:service}'
+plugins:
+  - serverless-rust
+custom:
+  rust:
+    cargoFlags: '--features lando/python3-sys'
+package:
+  individually: true
+  exclude:
+    - ./**
+functions:
+  endpoint:
+    handler: liblambda.handler
+    package:
+      include:
+        - liblambda.so
+    events:
+      - http:
+          path: '/'
+          method: POST

@@ -86,14 +86,10 @@ gateway!(|request, _| {
 
 fn issue_display(issue: Issue, jira: &Jira) -> String {
     format!(
-        "<{}|{}> {} (@{})",
+        "<{}|{}> {}",
         issue.permalink(&jira),
         issue.key,
-        issue.summary().unwrap_or_else(|| "no summary".into()),
-        issue
-            .assignee()
-            .map(|user| user.name)
-            .unwrap_or_else(|| "noone".into())
+        issue.summary().unwrap_or_else(|| "no summary".into())
     )
 }
 

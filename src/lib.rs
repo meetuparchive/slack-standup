@@ -84,7 +84,7 @@ gateway!(|request, _| {
     Ok(lando::Response::new(()))
 });
 
-fn owner(issue: Issue, status: &str) -> Option<String> {
+fn owner(issue: &Issue, status: &str) -> Option<String> {
     match status {
         "Closed" => None, // everyone owns this
         _ => Some(format!(" @{}", issue.assignee().map(|user| user.name).unwrap_or_else(|| "nobody".into())))
@@ -97,7 +97,7 @@ fn issue_display(issue: Issue, jira: &Jira, status: &str) -> String {
         issue.permalink(&jira),
         issue.key,
         issue.summary().unwrap_or_else(|| "no summary".into()),
-        owner(issue, status).unwrap_or_else(|| String::new())
+        owner(&issue, status).unwrap_or_else(|| String::new())
     )
 }
 

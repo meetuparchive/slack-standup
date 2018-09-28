@@ -87,7 +87,7 @@ gateway!(|request, _| {
 fn owner(issue: Issue, status: &str) -> Option<String> {
     match status {
         "Closed" => None, // everyone owns this
-        _ => Some(format!("@{}", issue.assignee().map(|user| user.name).unwrap_or_else(|| String::from("nobody")))
+        _ => Some(format!(" @{}", issue.assignee().map(|user| user.name).unwrap_or_else(|| "nobody".into()))
     }
 }
 

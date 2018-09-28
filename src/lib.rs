@@ -84,12 +84,20 @@ gateway!(|request, _| {
     Ok(lando::Response::new(()))
 });
 
-fn issue_display(issue: Issue, jira: &Jira) -> String {
+fn owner(issue: Issue, status: &str) -> Option<String> {
+    match status {
+        "Closed" => None, // everyone owns this
+        _ => Some(format!("@{}", issue.assignee().map(|user| user.name).unwrap_or_else(|| String::from("nobody")))
+    }
+}
+
+fn issue_display(issue: Issue, jira: &Jira, status: &str) -> String {
     format!(
-        "<{}|{}> {}",
+        "<{}|{}> {}{}",
         issue.permalink(&jira),
         issue.key,
-        issue.summary().unwrap_or_else(|| "no summary".into())
+        issue.summary().unwrap_or_else(|| "no summary".into()),
+        owner(issue, status).unwrap_or_else(|| String::new())
     )
 }
 
@@ -181,7 +189,7 @@ fn debrief(config: Config, slack_url: String) -> Result<(), String> {
             STATUS_EMOJI.get(&status).unwrap_or_else(|| &&":shrug:"),
             status
         )).or_insert(Vec::new())
-            .push(issue_display(issue, &jira));
+            .push(issue_display(issue, &jira, &status));
         acc
     });
 
